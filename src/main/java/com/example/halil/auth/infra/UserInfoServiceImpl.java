@@ -1,8 +1,8 @@
 package com.example.halil.auth.infra;
 
-import com.example.halil.auth.domain.AuthErrorCode;
 import com.example.halil.auth.domain.UserInfo;
 import com.example.halil.auth.domain.UserInfoService;
+import com.example.halil.auth.exception.AuthErrorCode;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;

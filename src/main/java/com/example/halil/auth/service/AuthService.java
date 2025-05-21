@@ -1,6 +1,5 @@
 package com.example.halil.auth.service;
 
-import com.example.halil.auth.domain.AuthErrorCode;
 import com.example.halil.auth.domain.JwtParams;
 import com.example.halil.auth.domain.JwtService;
 import com.example.halil.auth.domain.JwtType;
@@ -8,6 +7,7 @@ import com.example.halil.auth.domain.UserInfo;
 import com.example.halil.auth.domain.UserInfoService;
 import com.example.halil.auth.dto.JwtBundleDto;
 import com.example.halil.auth.dto.LoginRequestDto;
+import com.example.halil.auth.exception.AuthErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
