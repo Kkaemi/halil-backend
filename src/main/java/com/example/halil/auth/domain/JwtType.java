@@ -1,4 +1,4 @@
-package com.example.halil.auth;
+package com.example.halil.auth.domain;
 
 import lombok.Getter;
 
