@@ -23,28 +23,15 @@ public class JwtService {
 
     private final JwtProperties jwtProperties;
 
-    public String generateAccessToken(long userId) {
-        // 1 hour
-        long accessTokenExpirationTime = 1000L * 60 * 60;
-
-        return generateJwt(userId, accessTokenExpirationTime);
-    }
-
-    public String generateRefreshToken(long userId) {
-        // 1 month
-        long refreshTokenExpirationTime = 1000L * 60 * 60 * 24 * 30;
-
-        return generateJwt(userId, refreshTokenExpirationTime);
-    }
-
-    private String generateJwt(long userId, long expirationTime) {
+    public String generateJwt(JwtGenerationDto dto) {
         try {
             MACSigner signer = new MACSigner(jwtProperties.getSecret());
 
             JWTClaimsSet claimsSet = new Builder()
-                    .subject(String.valueOf(userId))
+                    .subject(String.valueOf(dto.userId()))
+                    .claim("role", dto.role())
                     .issueTime(new Date())
-                    .expirationTime(new Date(new Date().getTime() + expirationTime))
+                    .expirationTime(new Date(new Date().getTime() + dto.jwtType().getExpirationTime()))
                     .build();
 
             SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
@@ -72,6 +59,16 @@ public class JwtService {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             return Long.parseLong(signedJWT.getJWTClaimsSet().getSubject());
+        } catch (Exception e) {
+            log.error("토큰 클레임 분석 실패", e);
+            throw new ClaimExtractionException();
+        }
+    }
+
+    public String getUserRole(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            return signedJWT.getJWTClaimsSet().getClaimAsString("role");
         } catch (Exception e) {
             log.error("토큰 클레임 분석 실패", e);
             throw new ClaimExtractionException();
