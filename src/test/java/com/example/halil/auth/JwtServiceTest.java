@@ -26,10 +26,15 @@ class JwtServiceTest {
     void generateAccessToken() {
         // given
         long userId = 1L;
+        String role = "ROLE_USER";
+        JwtType access = JwtType.ACCESS;
+        JwtType refresh = JwtType.REFRESH;
+        JwtGenerationDto accessTokenDto = new JwtGenerationDto(userId, role, access);
+        JwtGenerationDto refreshTokenDto = new JwtGenerationDto(userId, role, refresh);
 
         // when
-        String accessToken = jwtService.generateAccessToken(userId);
-        String refreshToken = jwtService.generateRefreshToken(userId);
+        String accessToken = jwtService.generateJwt(accessTokenDto);
+        String refreshToken = jwtService.generateJwt(refreshTokenDto);
         boolean isAccessTokenVerified = jwtService.verifyToken(accessToken);
         boolean isRefreshTokenVerified = jwtService.verifyToken(refreshToken);
 
@@ -40,6 +45,8 @@ class JwtServiceTest {
         assertThat(isRefreshTokenVerified).isTrue();
         assertThat(jwtService.getUserIdFromToken(accessToken)).isEqualTo(userId);
         assertThat(jwtService.getUserIdFromToken(refreshToken)).isEqualTo(userId);
+        assertThat(jwtService.getUserRole(accessToken)).isEqualTo(role);
+        assertThat(jwtService.getUserRole(refreshToken)).isEqualTo(role);
     }
 
     @Test
@@ -47,6 +54,9 @@ class JwtServiceTest {
     void verifyToken() {
         // given
         long userId = 1L;
+        String role = "ROLE_USER";
+        JwtType access = JwtType.ACCESS;
+        JwtGenerationDto dto = new JwtGenerationDto(userId, role, access);
 
         byte[] bytes = new byte[32];
         SecureRandom random = new SecureRandom();
@@ -54,7 +64,7 @@ class JwtServiceTest {
 
         JwtProperties jwtProperties = new JwtProperties(new String(bytes));
         JwtService otherService = new JwtService(jwtProperties);
-        String modifiedAccessToken = otherService.generateAccessToken(userId);
+        String modifiedAccessToken = otherService.generateJwt(dto);
 
         // when
         boolean isTokenValid = jwtService.verifyToken(modifiedAccessToken);
