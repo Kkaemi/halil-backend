@@ -1,7 +1,7 @@
 package com.example.halil.auth.controller;
 
-import com.example.halil.auth.domain.AuthException;
-import com.example.halil.auth.dto.AuthErrorResponse;
+import com.example.halil.auth.exception.AuthErrorResponse;
+import com.example.halil.auth.exception.AuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;

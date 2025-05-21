@@ -1,4 +1,4 @@
-package com.example.halil.auth.dto;
+package com.example.halil.auth.exception;
 
 import java.time.LocalDateTime;
 

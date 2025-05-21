@@ -1,9 +1,9 @@
 package com.example.halil.auth.infra;
 
-import com.example.halil.auth.domain.AuthErrorCode;
 import com.example.halil.auth.domain.JwtParams;
 import com.example.halil.auth.domain.JwtService;
 import com.example.halil.auth.domain.JwtType;
+import com.example.halil.auth.exception.AuthErrorCode;
 import com.example.halil.properties.JwtProperties;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;

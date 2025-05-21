@@ -1,4 +1,4 @@
-package com.example.halil.auth.domain;
+package com.example.halil.auth.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

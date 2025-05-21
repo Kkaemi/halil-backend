@@ -1,4 +1,4 @@
-package com.example.halil.auth;
+package com.example.halil.auth.component;
 
 import com.example.halil.auth.domain.JwtService;
 import com.example.halil.auth.domain.JwtType;
