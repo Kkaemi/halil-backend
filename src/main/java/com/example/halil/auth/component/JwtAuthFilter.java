@@ -1,7 +1,6 @@
 package com.example.halil.auth.component;
 
 import com.example.halil.auth.domain.JwtService;
-import com.example.halil.auth.domain.JwtType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        if (!jwtService.verifyToken(token, JwtType.ACCESS)) {
+        if (!jwtService.verifyToken(token)) {
             filterChain.doFilter(request, response);
             return;
         }

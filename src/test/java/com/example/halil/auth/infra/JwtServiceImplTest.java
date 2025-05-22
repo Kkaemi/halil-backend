@@ -41,8 +41,8 @@ class JwtServiceImplTest {
         // when
         String accessToken = jwtServiceImpl.generateJwt(accessTokenDto);
         String refreshToken = jwtServiceImpl.generateJwt(refreshTokenDto);
-        boolean isAccessTokenVerified = jwtServiceImpl.verifyToken(accessToken, JwtType.ACCESS);
-        boolean isRefreshTokenVerified = jwtServiceImpl.verifyToken(refreshToken, JwtType.REFRESH);
+        boolean isAccessTokenVerified = jwtServiceImpl.verifyToken(accessToken);
+        boolean isRefreshTokenVerified = jwtServiceImpl.verifyToken(refreshToken);
 
         // then
         assertThat(accessToken).isNotNull();
@@ -77,7 +77,7 @@ class JwtServiceImplTest {
         String modifiedAccessToken = otherService.generateJwt(dto);
 
         // when
-        boolean isTokenValid = jwtServiceImpl.verifyToken(modifiedAccessToken, JwtType.ACCESS);
+        boolean isTokenValid = jwtServiceImpl.verifyToken(modifiedAccessToken);
 
         // then
         assertThat(isTokenValid).isFalse();

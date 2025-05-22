@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class AuthService {
+public class LoginService {
 
     private final JwtService jwtService;
     private final UserInfoService userInfoService;

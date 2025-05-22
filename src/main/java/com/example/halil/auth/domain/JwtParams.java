@@ -4,7 +4,7 @@ public record JwtParams(
         long userId,
         String role,
         JwtType jwtType,
-        Long expirationTime
+        Long expirationTimeMillis
 ) {
 
     public JwtParams(long userId, String role, JwtType jwtType) {
