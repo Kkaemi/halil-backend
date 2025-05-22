@@ -1,7 +1,5 @@
 package com.example.halil.auth.domain;
 
-import java.util.Date;
-
 public interface JwtService {
 
     String generateJwt(JwtParams jwtParams);
@@ -12,5 +10,7 @@ public interface JwtService {
 
     String getUserRoleFromToken(String token);
 
-    Date getExpirationTimeFromToken(String token);
+    AuthTokenBundle generateBundleBy(UserInfo userInfo);
+
+    AuthToken parse(String token);
 }

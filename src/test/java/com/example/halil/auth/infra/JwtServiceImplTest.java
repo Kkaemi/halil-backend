@@ -2,8 +2,10 @@ package com.example.halil.auth.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.halil.auth.domain.JwtParams;
-import com.example.halil.auth.domain.JwtType;
+import com.example.halil.auth.domain.AuthToken;
+import com.example.halil.auth.domain.AuthTokenBundle;
+import com.example.halil.auth.domain.TokenType;
+import com.example.halil.auth.domain.UserInfo;
 import com.example.halil.properties.JwtProperties;
 import java.security.SecureRandom;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,56 +32,41 @@ class JwtServiceImplTest {
     }
 
     @Test
-    @DisplayName("토큰 생성")
-    void generateAccessToken() {
+    @DisplayName("토큰 번들 생성")
+    void generateBundle() {
         // given
         long userId = 1L;
         String role = "ROLE_USER";
-        JwtParams accessTokenDto = new JwtParams(userId, role, JwtType.ACCESS);
-        JwtParams refreshTokenDto = new JwtParams(userId, role, JwtType.REFRESH);
+        UserInfo userInfo = new UserInfo(userId, role);
 
         // when
-        String accessToken = jwtServiceImpl.generateJwt(accessTokenDto);
-        String refreshToken = jwtServiceImpl.generateJwt(refreshTokenDto);
-        boolean isAccessTokenVerified = jwtServiceImpl.verifyToken(accessToken);
-        boolean isRefreshTokenVerified = jwtServiceImpl.verifyToken(refreshToken);
+        AuthTokenBundle authTokenBundle = jwtServiceImpl.generateBundleBy(userInfo);
 
         // then
-        assertThat(accessToken).isNotNull();
-        assertThat(refreshToken).isNotNull();
-        assertThat(isAccessTokenVerified).isTrue();
-        assertThat(isRefreshTokenVerified).isTrue();
-        assertThat(jwtServiceImpl.getUserIdFromToken(accessToken)).isEqualTo(userId);
-        assertThat(jwtServiceImpl.getUserIdFromToken(refreshToken)).isEqualTo(userId);
-        assertThat(jwtServiceImpl.getUserRoleFromToken(accessToken)).isEqualTo(role);
-        assertThat(jwtServiceImpl.getUserRoleFromToken(refreshToken)).isEqualTo(role);
+        assertThat(authTokenBundle.accessToken()).isNotNull();
+        assertThat(authTokenBundle.refreshToken()).isNotNull();
     }
 
     @Test
-    @DisplayName("외부에서 만들어진 토큰은 검증 결과 false")
-    void verifyToken() {
+    @DisplayName("토큰 파싱")
+    void parse() {
         // given
         long userId = 1L;
         String role = "ROLE_USER";
-        JwtParams dto = new JwtParams(userId, role, JwtType.ACCESS);
-
-        byte[] bytes = new byte[32];
-        SecureRandom random = new SecureRandom();
-
-        random.nextBytes(bytes);
-        String accessTokenSecret = new String(bytes);
-
-        random.nextBytes(bytes);
-        String refreshTokenSecret = new String(bytes);
-
-        JwtProperties jwtProperties = new JwtProperties(accessTokenSecret, refreshTokenSecret);
-        JwtServiceImpl otherService = new JwtServiceImpl(jwtProperties);
-        String modifiedAccessToken = otherService.generateJwt(dto);
+        UserInfo userInfo = new UserInfo(userId, role);
+        AuthTokenBundle authTokenBundle = jwtServiceImpl.generateBundleBy(userInfo);
 
         // when
-        boolean isTokenValid = jwtServiceImpl.verifyToken(modifiedAccessToken);
+        AuthToken authToken = jwtServiceImpl.parse(authTokenBundle.accessToken());
 
         // then
-        assertThat(isTokenValid).isFalse();
+        assertThat(authToken.getValue()).isNotNull();
+        assertThat(authToken.getType()).isEqualTo(TokenType.ACCESS);
+        assertThat(authToken.getIssuedAt().value()).isNotNull();
+        assertThat(authToken.getExpirationTime().value()).isNotNull();
+        assertThat(authToken.getIssuedAt().value().isBefore(authToken.getExpirationTime().value())).isTrue();
+        assertThat(authToken.getUserId()).isEqualTo(userId);
+        assertThat(authToken.getRole()).isEqualTo(role);
+        assertThat(authToken.isValid()).isTrue();
     }
 }

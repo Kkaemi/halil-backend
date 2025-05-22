@@ -1,8 +1,14 @@
 package com.example.halil.auth.infra;
 
+import com.example.halil.auth.domain.AuthToken;
+import com.example.halil.auth.domain.AuthTokenBundle;
+import com.example.halil.auth.domain.ExpirationTime;
+import com.example.halil.auth.domain.IssuedAt;
 import com.example.halil.auth.domain.JwtParams;
 import com.example.halil.auth.domain.JwtService;
 import com.example.halil.auth.domain.JwtType;
+import com.example.halil.auth.domain.TokenType;
+import com.example.halil.auth.domain.UserInfo;
 import com.example.halil.auth.exception.AuthErrorCode;
 import com.example.halil.properties.JwtProperties;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -11,6 +17,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import java.time.Instant;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,11 +91,6 @@ public class JwtServiceImpl implements JwtService {
         return String.valueOf(getClaimsSetFromToken(token).getClaim("role"));
     }
 
-    @Override
-    public Date getExpirationTimeFromToken(String token) {
-        return getClaimsSetFromToken(token).getExpirationTime();
-    }
-
     private JWTClaimsSet getClaimsSetFromToken(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
@@ -96,6 +98,86 @@ public class JwtServiceImpl implements JwtService {
         } catch (Exception e) {
             log.error("토큰 클레임 분석 실패", e);
             throw AuthErrorCode.CLAIM_EXTRACTION_FAILED.asException();
+        }
+    }
+
+    @Override
+    public AuthTokenBundle generateBundleBy(UserInfo userInfo) {
+        Instant now = Instant.now();
+        String accessToken = generateToken(
+                jwtProperties.getAccessTokenSecret(),
+                userInfo.userId(), userInfo.role(),
+                TokenType.ACCESS, now
+        );
+        String refreshToken = generateToken(
+                jwtProperties.getRefreshTokenSecret(),
+                userInfo.userId(), userInfo.role(),
+                TokenType.REFRESH, now
+        );
+        return new AuthTokenBundle(accessToken, refreshToken);
+    }
+
+    private String generateToken(
+            String secret,
+            long userId,
+            String role,
+            TokenType tokenType,
+            Instant now
+    ) {
+        try {
+            MACSigner signer = new MACSigner(secret);
+
+            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                    .subject(String.valueOf(userId))
+                    .claim("role", role)
+                    .claim("type", tokenType.name())
+                    .issueTime(Date.from(now))
+                    .expirationTime(Date.from(tokenType.calculateExpirationTime(now)))
+                    .build();
+
+            SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
+
+            signedJWT.sign(signer);
+
+            return signedJWT.serialize();
+        } catch (Exception e) {
+            log.error("토큰 생성 실패", e);
+            throw AuthErrorCode.TOKEN_GENERATION_FAILED.asException();
+        }
+    }
+
+    @Override
+    public AuthToken parse(String token) {
+        if (token == null) {
+            throw AuthErrorCode.INVALID_TOKEN.asException();
+        }
+
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+
+            JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
+            TokenType tokenType = TokenType.valueOf(jwtClaimsSet.getClaimAsString("type"));
+            IssuedAt issuedAt = new IssuedAt(jwtClaimsSet.getIssueTime().toInstant());
+            ExpirationTime expirationTime = new ExpirationTime(jwtClaimsSet.getExpirationTime().toInstant());
+            long userId = Long.parseLong(getClaimsSetFromToken(token).getSubject());
+            String role = String.valueOf(getClaimsSetFromToken(token).getClaim("role"));
+
+            MACVerifier verifier = switch (tokenType) {
+                case ACCESS -> new MACVerifier(jwtProperties.getAccessTokenSecret());
+                case REFRESH -> new MACVerifier(jwtProperties.getRefreshTokenSecret());
+            };
+
+            boolean verified = signedJWT.verify(verifier);
+
+            return new AuthToken(
+                    token, tokenType,
+                    issuedAt, expirationTime,
+                    userId, role,
+                    verified
+            );
+        } catch (Exception e) {
+            log.error("토큰 파싱 실패", e);
+            throw AuthErrorCode.TOKEN_PARSING_FAILED.asException();
         }
     }
 }
