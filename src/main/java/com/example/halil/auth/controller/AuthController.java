@@ -4,7 +4,7 @@ import com.example.halil.auth.dto.AccessTokenResponseDto;
 import com.example.halil.auth.dto.JwtBundleDto;
 import com.example.halil.auth.dto.LoginRequestDto;
 import com.example.halil.auth.dto.LoginResponseDto;
-import com.example.halil.auth.service.LoginService;
+import com.example.halil.auth.service.LoginUseCase;
 import com.example.halil.auth.service.TokenRefreshService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthController {
 
-    private final LoginService loginService;
+    private final LoginUseCase loginUseCase;
     private final TokenRefreshService tokenRefreshService;
 
     @PostMapping("/v1/auth/login")
@@ -28,7 +28,7 @@ public class AuthController {
             @RequestBody @Valid LoginRequestDto requestDto,
             HttpServletResponse response
     ) {
-        JwtBundleDto jwtBundleDto = loginService.login(requestDto);
+        JwtBundleDto jwtBundleDto = loginUseCase.login(requestDto);
 
         // 쿠키 세팅
         Cookie cookie = new Cookie("refresh_token", jwtBundleDto.refreshToken());
