@@ -31,15 +31,16 @@ public class JwtServiceImpl implements JwtService {
                 case REFRESH -> new MACSigner(jwtProperties.getRefreshTokenSecret());
             };
 
-            long expirationTime = dto.expirationTime() == null
+            long expirationTimeMillis = dto.expirationTimeMillis() == null
                     ? dto.jwtType().getExpirationTime()
-                    : dto.expirationTime();
+                    : dto.expirationTimeMillis();
 
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(String.valueOf(dto.userId()))
                     .claim("role", dto.role())
+                    .claim("type", dto.jwtType().name())
                     .issueTime(new Date())
-                    .expirationTime(new Date(new Date().getTime() + expirationTime))
+                    .expirationTime(new Date(new Date().getTime() + expirationTimeMillis))
                     .build();
 
             SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
@@ -54,9 +55,14 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean verifyToken(String token, JwtType jwtType) {
+    public boolean verifyToken(String token) {
+        if (token == null) {
+            throw AuthErrorCode.INVALID_TOKEN.asException();
+        }
+
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
+            JwtType jwtType = JwtType.valueOf(signedJWT.getJWTClaimsSet().getClaimAsString("type"));
             MACVerifier verifier = switch (jwtType) {
                 case ACCESS -> new MACVerifier(jwtProperties.getAccessTokenSecret());
                 case REFRESH -> new MACVerifier(jwtProperties.getRefreshTokenSecret());
@@ -70,20 +76,23 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public long getUserIdFromToken(String token) {
-        try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            return Long.parseLong(signedJWT.getJWTClaimsSet().getSubject());
-        } catch (Exception e) {
-            log.error("토큰 클레임 분석 실패", e);
-            throw AuthErrorCode.CLAIM_EXTRACTION_FAILED.asException();
-        }
+        return Long.parseLong(getClaimsSetFromToken(token).getSubject());
     }
 
     @Override
     public String getUserRoleFromToken(String token) {
+        return String.valueOf(getClaimsSetFromToken(token).getClaim("role"));
+    }
+
+    @Override
+    public Date getExpirationTimeFromToken(String token) {
+        return getClaimsSetFromToken(token).getExpirationTime();
+    }
+
+    private JWTClaimsSet getClaimsSetFromToken(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
-            return signedJWT.getJWTClaimsSet().getClaimAsString("role");
+            return signedJWT.getJWTClaimsSet();
         } catch (Exception e) {
             log.error("토큰 클레임 분석 실패", e);
             throw AuthErrorCode.CLAIM_EXTRACTION_FAILED.asException();
