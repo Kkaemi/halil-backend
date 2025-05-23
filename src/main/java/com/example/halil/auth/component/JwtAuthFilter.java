@@ -2,6 +2,7 @@ package com.example.halil.auth.component;
 
 import com.example.halil.auth.domain.AuthToken;
 import com.example.halil.auth.domain.JwtService;
+import com.example.halil.auth.domain.UserInfo;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,11 +44,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        long userId = authToken.getUserId();
-        String role = authToken.getRole();
+        UserInfo userInfo = authToken.getUserInfo();
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userId, null, List.of(new SimpleGrantedAuthority(role))
+                userInfo.userId(), null, List.of(new SimpleGrantedAuthority(userInfo.role()))
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

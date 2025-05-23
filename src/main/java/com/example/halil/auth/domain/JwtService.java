@@ -1,16 +1,10 @@
 package com.example.halil.auth.domain;
 
+import java.time.Instant;
+
 public interface JwtService {
 
-    String generateJwt(JwtParams jwtParams);
+    AuthTokenBundle generateBundle(UserInfo userInfo, Instant issuedAt);
 
-    boolean verifyToken(String token);
-
-    long getUserIdFromToken(String token);
-
-    String getUserRoleFromToken(String token);
-
-    AuthTokenBundle generateBundleBy(UserInfo userInfo);
-
-    AuthToken parse(String token);
+    AuthToken parse(String rawToken);
 }

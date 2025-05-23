@@ -8,6 +8,8 @@ import com.example.halil.auth.domain.TokenType;
 import com.example.halil.auth.domain.UserInfo;
 import com.example.halil.properties.JwtProperties;
 import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,9 +40,10 @@ class JwtServiceImplTest {
         long userId = 1L;
         String role = "ROLE_USER";
         UserInfo userInfo = new UserInfo(userId, role);
+        Instant now = ZonedDateTime.now().toInstant();
 
         // when
-        AuthTokenBundle authTokenBundle = jwtServiceImpl.generateBundleBy(userInfo);
+        AuthTokenBundle authTokenBundle = jwtServiceImpl.generateBundle(userInfo, now);
 
         // then
         assertThat(authTokenBundle.accessToken()).isNotNull();
@@ -54,7 +57,8 @@ class JwtServiceImplTest {
         long userId = 1L;
         String role = "ROLE_USER";
         UserInfo userInfo = new UserInfo(userId, role);
-        AuthTokenBundle authTokenBundle = jwtServiceImpl.generateBundleBy(userInfo);
+        Instant now = ZonedDateTime.now().toInstant();
+        AuthTokenBundle authTokenBundle = jwtServiceImpl.generateBundle(userInfo, now);
 
         // when
         AuthToken authToken = jwtServiceImpl.parse(authTokenBundle.accessToken());
@@ -65,8 +69,7 @@ class JwtServiceImplTest {
         assertThat(authToken.getIssuedAt().value()).isNotNull();
         assertThat(authToken.getExpirationTime().value()).isNotNull();
         assertThat(authToken.getIssuedAt().value().isBefore(authToken.getExpirationTime().value())).isTrue();
-        assertThat(authToken.getUserId()).isEqualTo(userId);
-        assertThat(authToken.getRole()).isEqualTo(role);
+        assertThat(authToken.getUserInfo()).isEqualTo(userInfo);
         assertThat(authToken.isValid()).isTrue();
     }
 }
