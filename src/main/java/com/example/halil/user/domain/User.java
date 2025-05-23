@@ -36,4 +36,8 @@ public class User {
         this.password = password;
         this.role = role;
     }
+
+    public void setTemporarilyPassword(String encodedTempPassword) {
+        this.password = new Password(encodedTempPassword);
+    }
 }

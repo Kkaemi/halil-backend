@@ -3,7 +3,7 @@ package com.example.halil.auth.service;
 import com.example.halil.auth.domain.AuthTokenBundle;
 import com.example.halil.auth.domain.JwtService;
 import com.example.halil.auth.domain.UserInfo;
-import com.example.halil.auth.domain.UserInfoService;
+import com.example.halil.auth.domain.UserService;
 import com.example.halil.auth.dto.JwtBundleDto;
 import com.example.halil.auth.dto.LoginRequestDto;
 import java.time.Instant;
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 public class LoginUseCase {
 
     private final JwtService jwtService;
-    private final UserInfoService userInfoService;
+    private final UserService userService;
 
     public JwtBundleDto login(LoginRequestDto requestDto) {
 
         // 유저 조회
-        UserInfo userInfo = userInfoService.getUserInfo(requestDto.getEmail(), requestDto.getPassword());
+        UserInfo userInfo = userService.getUserInfo(requestDto.getEmail(), requestDto.getPassword());
 
         // 토큰 생성
         AuthTokenBundle authTokenBundle = jwtService.generateBundle(userInfo, Instant.now());
