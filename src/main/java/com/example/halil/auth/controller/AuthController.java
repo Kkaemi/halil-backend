@@ -5,7 +5,7 @@ import com.example.halil.auth.dto.JwtBundleDto;
 import com.example.halil.auth.dto.LoginRequestDto;
 import com.example.halil.auth.dto.LoginResponseDto;
 import com.example.halil.auth.service.LoginUseCase;
-import com.example.halil.auth.service.TokenRefreshService;
+import com.example.halil.auth.service.TokenRefreshUseCase;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final LoginUseCase loginUseCase;
-    private final TokenRefreshService tokenRefreshService;
+    private final TokenRefreshUseCase tokenRefreshUseCase;
 
     @PostMapping("/v1/auth/login")
     public LoginResponseDto login(
@@ -46,7 +46,7 @@ public class AuthController {
             @CookieValue(value = "refresh_token", required = false) String refreshToken,
             HttpServletResponse response
     ) {
-        JwtBundleDto jwtBundleDto = tokenRefreshService.refresh(refreshToken);
+        JwtBundleDto jwtBundleDto = tokenRefreshUseCase.refresh(refreshToken);
         String reissuedAccessToken = jwtBundleDto.accessToken();
         String reissuedRefreshToken = Optional.ofNullable(jwtBundleDto.refreshToken()).orElse(refreshToken);
 
@@ -70,5 +70,4 @@ public class AuthController {
     }
 
     // TODO: 비밀번호 찾기 기능 구현하기
-
 }
