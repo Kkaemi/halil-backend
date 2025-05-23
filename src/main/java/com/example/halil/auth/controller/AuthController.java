@@ -4,16 +4,20 @@ import com.example.halil.auth.dto.AccessTokenResponseDto;
 import com.example.halil.auth.dto.JwtBundleDto;
 import com.example.halil.auth.dto.LoginRequestDto;
 import com.example.halil.auth.dto.LoginResponseDto;
+import com.example.halil.auth.dto.PasswordResetRequestDto;
 import com.example.halil.auth.service.LoginUseCase;
+import com.example.halil.auth.service.PasswordResetUseCase;
 import com.example.halil.auth.service.TokenRefreshUseCase;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ public class AuthController {
 
     private final LoginUseCase loginUseCase;
     private final TokenRefreshUseCase tokenRefreshUseCase;
+    private final PasswordResetUseCase passwordResetUseCase;
 
     @PostMapping("/v1/auth/login")
     public LoginResponseDto login(
@@ -69,5 +74,9 @@ public class AuthController {
         return responseDto;
     }
 
-    // TODO: 비밀번호 찾기 기능 구현하기
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/v1/auth/password-reset")
+    public void resetPassword(@RequestBody @Valid PasswordResetRequestDto requestDto) {
+        passwordResetUseCase.resetPassword(requestDto);
+    }
 }

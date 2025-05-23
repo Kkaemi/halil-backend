@@ -15,7 +15,10 @@ public enum AuthErrorCode {
     // JWT 관련
     TOKEN_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "토큰 생성 실패"),
     TOKEN_PARSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "토큰 파싱 실패"),
-    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다");
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다"),
+
+    // 메일 관련
+    MAIL_DELIVERY_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송 실패");
 
     private final HttpStatus httpStatus;
     private final String message;
