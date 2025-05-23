@@ -6,6 +6,7 @@ import com.example.halil.auth.domain.UserInfo;
 import com.example.halil.auth.domain.UserInfoService;
 import com.example.halil.auth.dto.JwtBundleDto;
 import com.example.halil.auth.dto.LoginRequestDto;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class LoginUseCase {
         UserInfo userInfo = userInfoService.getUserInfo(requestDto.getEmail(), requestDto.getPassword());
 
         // 토큰 생성
-        AuthTokenBundle authTokenBundle = jwtService.generateBundleBy(userInfo);
+        AuthTokenBundle authTokenBundle = jwtService.generateBundle(userInfo, Instant.now());
 
         // DTO 매핑 & 반환
         String accessToken = authTokenBundle.accessToken();
