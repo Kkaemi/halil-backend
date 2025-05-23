@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class TokenRefreshService {
+public class TokenRefreshUseCase {
 
     private final JwtService jwtService;
 
