@@ -40,4 +40,11 @@ public class User {
     public void setTemporarilyPassword(String encodedTempPassword) {
         this.password = new Password(encodedTempPassword);
     }
+
+    public void updatePassword(PasswordService passwordService, String rawPassword) {
+        if (passwordService.matches(rawPassword, this.getPassword().getValue())) {
+            throw new IllegalArgumentException("변경 할 비밀번호와 현재 비밀번호가 일치합니다.");
+        }
+        this.password = passwordService.encode(rawPassword);
+    }
 }
