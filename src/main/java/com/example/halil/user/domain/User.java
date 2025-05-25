@@ -1,7 +1,7 @@
 package com.example.halil.user.domain;
 
+import com.example.halil.user.domain.exception.PasswordCannotBeReused;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,32 +19,36 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Embedded
-    private Password password;
+    @Column(name = "password", nullable = false)
+    private String encodedPassword;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    public User(String email, Password password, UserRole role) {
+    public User(String email, String encodedPassword, UserRole role) {
         this.email = email;
-        this.password = password;
+        this.encodedPassword = encodedPassword;
         this.role = role;
     }
 
     public void setTemporarilyPassword(String encodedTempPassword) {
-        this.password = new Password(encodedTempPassword);
+        this.encodedPassword = encodedTempPassword;
     }
 
-    public void updatePassword(PasswordService passwordService, String rawPassword) {
-        if (passwordService.matches(rawPassword, this.getPassword().getValue())) {
-            throw new IllegalArgumentException("변경 할 비밀번호와 현재 비밀번호가 일치합니다.");
+    public void updatePassword(
+            PasswordService passwordService,
+            String rawPassword
+    ) throws PasswordCannotBeReused {
+        if (passwordService.matches(rawPassword, this.encodedPassword)) {
+            throw new PasswordCannotBeReused();
         }
-        this.password = passwordService.encode(rawPassword);
+        this.encodedPassword = passwordService.encode(rawPassword);
     }
 }

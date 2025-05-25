@@ -20,13 +20,13 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public UserInfo getUserInfo(String email, String password) {
+    public UserInfo getUserInfo(String email, String rawPassword) {
         // 유저를 찾을 수 없으면 예외 발생
         User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(AuthErrorCode.USER_NOT_FOUND_BY_EMAIL::asException);
 
         // 비밀번호 일치 검사
-        if (!passwordEncoder.matches(password, user.getPassword().getValue())) {
+        if (!passwordEncoder.matches(rawPassword, user.getEncodedPassword())) {
             throw AuthErrorCode.PASSWORD_MISMATCH.asException();
         }
 

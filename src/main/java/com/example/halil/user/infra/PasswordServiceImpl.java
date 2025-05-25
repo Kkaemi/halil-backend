@@ -1,6 +1,5 @@
 package com.example.halil.user.infra;
 
-import com.example.halil.user.domain.Password;
 import com.example.halil.user.domain.PasswordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,8 +12,8 @@ public class PasswordServiceImpl implements PasswordService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Password encode(String rawPassword) {
-        return new Password(passwordEncoder.encode(rawPassword));
+    public String encode(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 
     @Override
