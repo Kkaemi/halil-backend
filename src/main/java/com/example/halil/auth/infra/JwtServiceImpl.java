@@ -7,7 +7,7 @@ import com.example.halil.auth.domain.IssuedAt;
 import com.example.halil.auth.domain.JwtService;
 import com.example.halil.auth.domain.TokenType;
 import com.example.halil.auth.domain.UserInfo;
-import com.example.halil.auth.exception.AuthErrorCode;
+import com.example.halil.auth.service.AuthErrorCode;
 import com.example.halil.properties.JwtProperties;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -57,7 +57,7 @@ public class JwtServiceImpl implements JwtService {
             };
         } catch (KeyLengthException e) {
             log.error("시크릿 키 길이는 최소 32바이트여야 합니다", e);
-            throw AuthErrorCode.TOKEN_GENERATION_FAILED.asException();
+            throw AuthErrorCode.TOKEN_GENERATION_FAILED.exception();
         }
     }
 
@@ -76,7 +76,7 @@ public class JwtServiceImpl implements JwtService {
             jwt.sign(signer);
         } catch (JOSEException e) {
             log.error("JWS 객체에 서명 할 수 없습니다", e);
-            throw AuthErrorCode.TOKEN_GENERATION_FAILED.asException();
+            throw AuthErrorCode.TOKEN_GENERATION_FAILED.exception();
         }
     }
 
@@ -105,14 +105,14 @@ public class JwtServiceImpl implements JwtService {
 
     private SignedJWT parseSignedJwt(String token) {
         if (token == null) {
-            throw AuthErrorCode.INVALID_TOKEN.asException();
+            throw AuthErrorCode.INVALID_TOKEN.exception();
         }
 
         try {
             return SignedJWT.parse(token);
         } catch (ParseException e) {
             log.error("JWT를 파싱할 수 없습니다", e);
-            throw AuthErrorCode.INVALID_TOKEN.asException();
+            throw AuthErrorCode.INVALID_TOKEN.exception();
         }
     }
 
@@ -121,7 +121,7 @@ public class JwtServiceImpl implements JwtService {
             return signedJwt.getJWTClaimsSet();
         } catch (ParseException e) {
             log.error("JWT 클레임 추출에 실패했습니다", e);
-            throw AuthErrorCode.INVALID_TOKEN.asException();
+            throw AuthErrorCode.INVALID_TOKEN.exception();
         }
     }
 
@@ -133,7 +133,7 @@ public class JwtServiceImpl implements JwtService {
             };
         } catch (JOSEException e) {
             log.error("시크릿 키 길이는 최소 32바이트여야 합니다", e);
-            throw AuthErrorCode.TOKEN_GENERATION_FAILED.asException();
+            throw AuthErrorCode.TOKEN_GENERATION_FAILED.exception();
         }
     }
 
@@ -142,7 +142,7 @@ public class JwtServiceImpl implements JwtService {
             return signedJwt.verify(verifier);
         } catch (JOSEException e) {
             log.error("JWS 객체를 검증 할 수 없습니다", e);
-            throw AuthErrorCode.TOKEN_GENERATION_FAILED.asException();
+            throw AuthErrorCode.TOKEN_GENERATION_FAILED.exception();
         }
     }
 }

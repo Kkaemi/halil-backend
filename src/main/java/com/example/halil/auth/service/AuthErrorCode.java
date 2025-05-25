@@ -1,11 +1,10 @@
-package com.example.halil.auth.exception;
+package com.example.halil.auth.service;
 
-import lombok.Getter;
+import com.example.halil.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
-@Getter
 public enum AuthErrorCode {
 
     // 로그인 관련
@@ -14,7 +13,6 @@ public enum AuthErrorCode {
 
     // JWT 관련
     TOKEN_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "토큰 생성 실패"),
-    TOKEN_PARSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "토큰 파싱 실패"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다"),
 
     // 메일 관련
@@ -23,7 +21,7 @@ public enum AuthErrorCode {
     private final HttpStatus httpStatus;
     private final String message;
 
-    public AuthException asException() {
-        return new AuthException(message, httpStatus);
+    public ApiException exception() {
+        return new ApiException(message, httpStatus);
     }
 }

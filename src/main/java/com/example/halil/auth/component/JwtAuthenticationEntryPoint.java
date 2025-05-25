@@ -1,6 +1,6 @@
 package com.example.halil.auth.component;
 
-import com.example.halil.auth.exception.AuthErrorResponse;
+import com.example.halil.exception.CommonErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,12 +37,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 httpStatusCode, path, method, ip, ua
         );
 
-        AuthErrorResponse authErrorResponse = new AuthErrorResponse(
+        CommonErrorResponse commonErrorResponse = new CommonErrorResponse(
                 httpStatusCode, authException.getMessage(), LocalDateTime.now(), path
         );
 
         response.setContentType("application/json");
         response.setStatus(httpStatusCode);
-        response.getWriter().write(objectMapper.writeValueAsString(authErrorResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(commonErrorResponse));
     }
 }
