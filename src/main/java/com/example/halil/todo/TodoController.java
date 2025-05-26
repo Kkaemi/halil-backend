@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,5 +35,14 @@ public class TodoController {
             @RequestBody @Valid TodoUpdateRequestDto requestDto
     ) {
         todoService.update(todoId, userId, requestDto);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/v1/todos/{todoId}")
+    public void deleteTodo(
+            @PathVariable @Positive long todoId,
+            @AuthenticationPrincipal long userId
+    ) {
+        todoService.delete(todoId, userId);
     }
 }

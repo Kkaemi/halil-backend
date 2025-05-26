@@ -43,4 +43,16 @@ public class TodoService {
                 requestDto.getCompleted()
         );
     }
+
+    public void delete(long todoId, long userId) {
+
+        Todo todo = todoRepository.findByIdWithUser(todoId)
+                .orElseThrow(TodoErrorCode.TODO_NOT_FOUND::exception);
+
+        if (todo.getUser().getId() != userId) {
+            throw TodoErrorCode.ACCESS_DENIED.exception();
+        }
+
+        todoRepository.delete(todo);
+    }
 }
