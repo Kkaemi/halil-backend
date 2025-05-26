@@ -61,4 +61,16 @@ public class Todo {
         this.createdAt = createdAt;
         this.completed = completed;
     }
+
+    public void update(
+            String titleOrNull,
+            String descriptionOrNull,
+            LocalDateTime dueDateOrNull,
+            Boolean completedOrNull
+    ) {
+        this.title = titleOrNull != null ? titleOrNull : this.title;
+        this.description = descriptionOrNull != null ? descriptionOrNull : this.description;
+        this.dueDate = dueDateOrNull != null ? dueDateOrNull : this.dueDate;
+        this.completed = completedOrNull != null ? completedOrNull : this.completed;
+    }
 }
