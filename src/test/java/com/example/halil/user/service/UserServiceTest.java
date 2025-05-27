@@ -71,7 +71,7 @@ class UserServiceTest {
         String rawPassword = "this_is_password!1";
         UserCreationDto userCreationDto = new UserCreationDto(email, rawPassword);
         when(userRepository.findFirstByEmail(email))
-                .thenReturn(Optional.of(new User(email, null, null)));
+                .thenReturn(Optional.of(new User(email, null, null, null)));
 
         // when and then
         assertThatThrownBy(() -> userService.create(userCreationDto))
@@ -84,7 +84,7 @@ class UserServiceTest {
         // given
         long userId = 1L;
         String rawPassword = "raw_password1234";
-        User user = new User("", "", UserRole.ROLE_USER);
+        User user = new User("", "", UserRole.ROLE_USER, null);
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(passwordService.matches(rawPassword, user.getEncodedPassword())).thenReturn(true);

@@ -32,10 +32,15 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    public User(String email, String encodedPassword, UserRole role) {
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
+
+    public User(String email, String encodedPassword, UserRole role, UserStatus userStatus) {
         this.email = email;
         this.encodedPassword = encodedPassword;
         this.role = role;
+        this.userStatus = userStatus;
     }
 
     public void setTemporarilyPassword(String encodedTempPassword) {
@@ -50,5 +55,9 @@ public class User {
             throw new PasswordCannotBeReused();
         }
         this.encodedPassword = passwordService.encode(rawPassword);
+    }
+
+    public void withdraw() {
+        this.userStatus = UserStatus.DELETED;
     }
 }

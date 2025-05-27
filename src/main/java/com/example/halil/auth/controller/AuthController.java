@@ -40,6 +40,7 @@ public class AuthController {
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setAttribute("SameSite", "Strict");
+        cookie.setPath("/");
         response.addCookie(cookie);
 
         return new LoginResponseDto(jwtBundleDto.accessToken());
@@ -61,6 +62,7 @@ public class AuthController {
 
         if (reissuedAccessToken == null) {
             cookie.setMaxAge(0);
+            cookie.setPath("/");
             response.addCookie(cookie);
             return responseDto;
         }

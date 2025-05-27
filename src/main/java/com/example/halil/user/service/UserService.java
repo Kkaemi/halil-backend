@@ -4,6 +4,7 @@ import com.example.halil.user.domain.PasswordService;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
 import com.example.halil.user.domain.UserRole;
+import com.example.halil.user.domain.UserStatus;
 import com.example.halil.user.domain.exception.PasswordCannotBeReused;
 import com.example.halil.user.dto.UserCreationDto;
 import com.example.halil.user.dto.UserSignupResponseDto;
@@ -28,7 +29,7 @@ public class UserService {
                 });
 
         String encodedPassword = passwordService.encode(dto.getPassword());
-        User user = new User(dto.getEmail(), encodedPassword, UserRole.ROLE_USER);
+        User user = new User(dto.getEmail(), encodedPassword, UserRole.ROLE_USER, UserStatus.ACTIVE);
 
         userRepository.save(user);
 
@@ -45,5 +46,12 @@ public class UserService {
         } catch (PasswordCannotBeReused e) {
             throw UserErrorCode.PASSWORD_CANNOT_BE_REUSED.exception();
         }
+    }
+
+    public void delete(long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserErrorCode.USER_NOT_FOUND_BY_ID::exception);
+        
+        user.withdraw();
     }
 }

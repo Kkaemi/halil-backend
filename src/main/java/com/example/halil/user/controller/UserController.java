@@ -4,10 +4,13 @@ import com.example.halil.user.dto.ChangePasswordRequestDto;
 import com.example.halil.user.dto.UserCreationDto;
 import com.example.halil.user.dto.UserSignupResponseDto;
 import com.example.halil.user.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,5 +35,20 @@ public class UserController {
             @RequestBody @Valid ChangePasswordRequestDto requestDto
     ) {
         userService.updatePassword(userId, requestDto.getPassword());
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/v1/users")
+    public void delete(
+            @AuthenticationPrincipal long userId,
+            HttpServletResponse response
+    ) {
+        userService.delete(userId);
+
+        // 회원 탈퇴 후 쿠키 삭제
+        Cookie cookie = new Cookie("refresh_token", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 }
