@@ -1,4 +1,4 @@
-package com.example.halil.todo;
+package com.example.halil.todo.application;
 
 import com.example.halil.exception.ApiException;
 import lombok.RequiredArgsConstructor;

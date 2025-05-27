@@ -1,5 +1,7 @@
 package com.example.halil.todo;
 
+import com.example.halil.todo.application.TodoService;
+import com.example.halil.todo.domain.Author;
 import com.example.halil.todo.dto.TodoSaveRequestDto;
 import com.example.halil.todo.dto.TodoSaveResponseDto;
 import com.example.halil.todo.dto.TodoUpdateRequestDto;
@@ -23,8 +25,11 @@ public class TodoController {
     private final TodoService todoService;
 
     @PostMapping("/v1/todos")
-    public TodoSaveResponseDto createTodo(@RequestBody @Valid TodoSaveRequestDto requestDto) {
-        return todoService.save(requestDto);
+    public TodoSaveResponseDto createTodo(
+            @AuthenticationPrincipal long userId,
+            @RequestBody @Valid TodoSaveRequestDto requestDto
+    ) {
+        return todoService.save(userId, requestDto);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -34,7 +39,7 @@ public class TodoController {
             @AuthenticationPrincipal long userId,
             @RequestBody @Valid TodoUpdateRequestDto requestDto
     ) {
-        todoService.update(todoId, userId, requestDto);
+        todoService.update(todoId, new Author(userId), requestDto);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -43,6 +48,7 @@ public class TodoController {
             @PathVariable @Positive long todoId,
             @AuthenticationPrincipal long userId
     ) {
-        todoService.delete(todoId, userId);
+        Author author = new Author(userId);
+        todoService.delete(todoId, author);
     }
 }
