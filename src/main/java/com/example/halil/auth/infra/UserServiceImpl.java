@@ -5,6 +5,7 @@ import com.example.halil.auth.domain.UserService;
 import com.example.halil.auth.service.AuthErrorCode;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
+import com.example.halil.user.domain.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,11 @@ public class UserServiceImpl implements UserService {
         // 유저를 찾을 수 없으면 예외 발생
         User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(AuthErrorCode.USER_NOT_FOUND_BY_EMAIL::exception);
+
+        // 탈퇴된 회원이면 로그인 안됨
+        if (user.getUserStatus().equals(UserStatus.DELETED)) {
+            throw AuthErrorCode.USER_DELETED.exception();
+        }
 
         // 비밀번호 일치 검사
         if (!passwordEncoder.matches(rawPassword, user.getEncodedPassword())) {
