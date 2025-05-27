@@ -39,7 +39,7 @@ public class UserService {
     public void updatePassword(long userId, String rawPassword) {
         // 유저를 찾을 수 없으면 예외 발생
         User user = userRepository.findById(userId)
-                .orElseThrow(UserErrorCode.USER_NOT_FOUND_BY_EMAIL::exception);
+                .orElseThrow(UserErrorCode.USER_NOT_FOUND_BY_ID::exception);
 
         try {
             user.updatePassword(passwordService, rawPassword);
@@ -51,7 +51,7 @@ public class UserService {
     public void delete(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserErrorCode.USER_NOT_FOUND_BY_ID::exception);
-        
+
         user.withdraw();
     }
 }
