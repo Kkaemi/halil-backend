@@ -1,6 +1,6 @@
 package com.example.halil.user.service;
 
-import com.example.halil.user.domain.PasswordService;
+import com.example.halil.user.domain.Password;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
 import com.example.halil.user.domain.UserRole;
@@ -8,6 +8,7 @@ import com.example.halil.user.domain.UserStatus;
 import com.example.halil.user.domain.exception.PasswordCannotBeReused;
 import com.example.halil.user.dto.UserCreationDto;
 import com.example.halil.user.dto.UserSignupResponseDto;
+import com.example.halil.user.infra.BCryptPassword;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordService passwordService;
 
     public UserSignupResponseDto create(UserCreationDto dto) {
 
@@ -28,8 +28,8 @@ public class UserService {
                     throw UserErrorCode.EMAIL_ALREADY_EXISTS.exception();
                 });
 
-        String encodedPassword = passwordService.encode(dto.getPassword());
-        User user = new User(dto.getEmail(), encodedPassword, UserRole.ROLE_USER, UserStatus.ACTIVE);
+        Password password = new BCryptPassword(dto.getPassword());
+        User user = new User(dto.getEmail(), password, UserRole.ROLE_USER, UserStatus.ACTIVE);
 
         userRepository.save(user);
 
@@ -41,8 +41,10 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserErrorCode.USER_NOT_FOUND_BY_ID::exception);
 
+        Password password = new BCryptPassword(rawPassword);
+
         try {
-            user.updatePassword(passwordService, rawPassword);
+            user.updatePassword(password);
         } catch (PasswordCannotBeReused e) {
             throw UserErrorCode.PASSWORD_CANNOT_BE_REUSED.exception();
         }

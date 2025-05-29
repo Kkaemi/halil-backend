@@ -6,12 +6,13 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-import com.example.halil.user.domain.PasswordService;
+import com.example.halil.user.domain.Password;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
 import com.example.halil.user.domain.UserRole;
 import com.example.halil.user.dto.UserCreationDto;
 import com.example.halil.user.dto.UserSignupResponseDto;
+import com.example.halil.user.infra.BCryptPassword;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,9 +29,6 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private PasswordService passwordService;
-
     @InjectMocks
     private UserService userService;
 
@@ -41,10 +39,8 @@ class UserServiceTest {
         long userId = 1L;
         String email = "thisisemail@email.com";
         String rawPassword = "this_is_password1234";
-        String encodedPassword = "encodedPassword1234!!";
         UserCreationDto userCreationDto = new UserCreationDto(email, rawPassword);
 
-        when(passwordService.encode(rawPassword)).thenReturn(encodedPassword);
         when(userRepository.findFirstByEmail(email)).thenReturn(Optional.empty());
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -69,9 +65,10 @@ class UserServiceTest {
         // given
         String email = "thisisemail@email.com";
         String rawPassword = "this_is_password!1";
+        Password password = new BCryptPassword(rawPassword);
         UserCreationDto userCreationDto = new UserCreationDto(email, rawPassword);
         when(userRepository.findFirstByEmail(email))
-                .thenReturn(Optional.of(new User(email, null, null, null)));
+                .thenReturn(Optional.of(new User(email, password, null, null)));
 
         // when and then
         assertThatThrownBy(() -> userService.create(userCreationDto))
@@ -84,10 +81,10 @@ class UserServiceTest {
         // given
         long userId = 1L;
         String rawPassword = "raw_password1234";
-        User user = new User("", "", UserRole.ROLE_USER, null);
+        Password password = new BCryptPassword(rawPassword);
+        User user = new User("", password, UserRole.ROLE_USER, null);
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
-        when(passwordService.matches(rawPassword, user.getEncodedPassword())).thenReturn(true);
 
         // when and then
         assertThatThrownBy(() -> userService.updatePassword(userId, rawPassword))

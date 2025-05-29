@@ -5,9 +5,8 @@ import com.example.halil.auth.domain.UserService;
 import com.example.halil.auth.service.AuthErrorCode;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
-import com.example.halil.user.domain.UserStatus;
+import com.example.halil.user.infra.BCryptPassword;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     @Override
@@ -26,15 +24,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(AuthErrorCode.USER_NOT_FOUND_BY_EMAIL::exception);
 
-        // 탈퇴된 회원이면 로그인 안됨
-        if (user.getUserStatus().equals(UserStatus.DELETED)) {
-            throw AuthErrorCode.USER_DELETED.exception();
-        }
-
-        // 비밀번호 일치 검사
-        if (!passwordEncoder.matches(rawPassword, user.getEncodedPassword())) {
-            throw AuthErrorCode.PASSWORD_MISMATCH.exception();
-        }
+        user.authenticateWith(new BCryptPassword(rawPassword));
 
         return new UserInfo(user.getId(), user.getRole().name());
     }
@@ -46,6 +36,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(AuthErrorCode.USER_NOT_FOUND_BY_EMAIL::exception);
 
         // 임시 비밀번호 설정
-        user.setTemporarilyPassword(passwordEncoder.encode(temporaryPassword));
+        user.setTemporaryPassword(new BCryptPassword(temporaryPassword));
     }
 }
