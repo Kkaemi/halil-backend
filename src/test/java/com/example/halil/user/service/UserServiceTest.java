@@ -2,35 +2,18 @@ package com.example.halil.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
 
 import com.example.halil.user.domain.Password;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
-import com.example.halil.user.domain.UserRole;
 import com.example.halil.user.dto.UserCreationDto;
 import com.example.halil.user.dto.UserSignupResponseDto;
 import com.example.halil.user.infra.BCryptPassword;
-import java.util.Optional;
+import com.example.halil.user.infra.UserMemoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
-@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
-    private UserService userService;
 
     @Test
     @DisplayName("회원가입")
@@ -40,23 +23,13 @@ class UserServiceTest {
         String email = "thisisemail@email.com";
         String rawPassword = "this_is_password1234";
         UserCreationDto userCreationDto = new UserCreationDto(email, rawPassword);
-
-        when(userRepository.findFirstByEmail(email)).thenReturn(Optional.empty());
-
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        doAnswer(invocation -> {
-            User parameter = invocation.getArgument(0);
-            ReflectionTestUtils.setField(parameter, "id", userId);
-            return null;
-        }).when(userRepository)
-                // ArgumentCaptor로 userRepository.save() 메소드에 들어오는 파라미터를 찍는다
-                .save(userCaptor.capture());
+        UserService sut = new UserService(new UserMemoryRepository());
 
         // when
-        UserSignupResponseDto result = userService.create(userCreationDto);
+        UserSignupResponseDto result = sut.create(userCreationDto);
 
         // then
-        assertThat(result.userId()).isEqualTo(userCaptor.getValue().getId());
+        assertThat(result.userId()).isEqualTo(userId);
     }
 
     @Test
@@ -66,12 +39,17 @@ class UserServiceTest {
         String email = "thisisemail@email.com";
         String rawPassword = "this_is_password!1";
         Password password = new BCryptPassword(rawPassword);
+        User dummyUser = new User(email, password, null, null);
+
+        UserRepository userRepository = new UserMemoryRepository();
+        userRepository.save(dummyUser);
+
         UserCreationDto userCreationDto = new UserCreationDto(email, rawPassword);
-        when(userRepository.findFirstByEmail(email))
-                .thenReturn(Optional.of(new User(email, password, null, null)));
+
+        UserService sut = new UserService(userRepository);
 
         // when and then
-        assertThatThrownBy(() -> userService.create(userCreationDto))
+        assertThatThrownBy(() -> sut.create(userCreationDto))
                 .isInstanceOf(UserErrorCode.EMAIL_ALREADY_EXISTS.exception().getClass());
     }
 
@@ -82,12 +60,15 @@ class UserServiceTest {
         long userId = 1L;
         String rawPassword = "raw_password1234";
         Password password = new BCryptPassword(rawPassword);
-        User user = new User("", password, UserRole.ROLE_USER, null);
+        User user = new User("", password, null, null);
 
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        UserRepository userRepository = new UserMemoryRepository();
+        userRepository.save(user);
+
+        UserService sut = new UserService(userRepository);
 
         // when and then
-        assertThatThrownBy(() -> userService.updatePassword(userId, rawPassword))
+        assertThatThrownBy(() -> sut.updatePassword(userId, rawPassword))
                 .isInstanceOf(UserErrorCode.PASSWORD_CANNOT_BE_REUSED.exception().getClass());
     }
 }
