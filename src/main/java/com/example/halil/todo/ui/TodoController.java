@@ -1,4 +1,4 @@
-package com.example.halil.todo;
+package com.example.halil.todo.ui;
 
 import com.example.halil.todo.application.TodoService;
 import com.example.halil.todo.domain.Author;
