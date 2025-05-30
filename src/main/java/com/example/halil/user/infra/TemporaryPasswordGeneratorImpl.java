@@ -1,6 +1,6 @@
-package com.example.halil.auth.infra;
+package com.example.halil.user.infra;
 
-import com.example.halil.auth.domain.TemporaryPasswordGenerator;
+import com.example.halil.user.domain.TemporaryPasswordGenerator;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.LinkedList;

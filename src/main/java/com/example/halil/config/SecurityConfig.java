@@ -25,7 +25,7 @@ public class SecurityConfig {
     private static final RequestMatcher[] PUBLIC_URLS = {
             new AntPathRequestMatcher("/api/v*/auth/login", HttpMethod.POST.name()),
             new AntPathRequestMatcher("/api/v*/auth/token-refresh", HttpMethod.POST.name()),
-            new AntPathRequestMatcher("/api/v*/auth/password-reset", HttpMethod.POST.name()),
+            new AntPathRequestMatcher("/api/v*/users/password-reset", HttpMethod.POST.name()),
             new AntPathRequestMatcher("/api/v*/users", HttpMethod.POST.name()),
     };
 

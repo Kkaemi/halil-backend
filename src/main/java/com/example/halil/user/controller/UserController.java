@@ -1,8 +1,10 @@
 package com.example.halil.user.controller;
 
 import com.example.halil.user.dto.ChangePasswordRequestDto;
+import com.example.halil.user.dto.PasswordResetRequestDto;
 import com.example.halil.user.dto.UserCreationDto;
 import com.example.halil.user.dto.UserSignupResponseDto;
+import com.example.halil.user.service.PasswordResetUseCase;
 import com.example.halil.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final PasswordResetUseCase passwordResetUseCase;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/v1/users")
@@ -35,6 +38,12 @@ public class UserController {
             @RequestBody @Valid ChangePasswordRequestDto requestDto
     ) {
         userService.updatePassword(userId, requestDto.getPassword());
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/v1/users/password-reset")
+    public void resetPassword(@RequestBody @Valid PasswordResetRequestDto requestDto) {
+        passwordResetUseCase.resetPassword(requestDto.getEmail());
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
