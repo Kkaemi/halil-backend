@@ -7,13 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -28,14 +26,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     ) throws IOException {
 
         String path = request.getRequestURI();
-        String method = request.getMethod();
-        String ip = request.getRemoteAddr();
-        String ua = request.getHeader("User-Agent");
         int httpStatusCode = HttpStatus.UNAUTHORIZED.value();
-
-        log.warn("[event=authentication_failure] [status={}] [path={}] [method={}] [ip={}] [user-agent={}]",
-                httpStatusCode, path, method, ip, ua
-        );
 
         CommonErrorResponse commonErrorResponse = new CommonErrorResponse(
                 httpStatusCode, authException.getMessage(), LocalDateTime.now(), path

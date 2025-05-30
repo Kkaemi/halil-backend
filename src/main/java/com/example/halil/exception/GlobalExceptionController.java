@@ -5,17 +5,25 @@ import com.example.halil.user.domain.exception.PasswordMismatchException;
 import com.example.halil.user.domain.exception.PasswordReusedException;
 import com.example.halil.user.domain.exception.UserStatusException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionController extends ResponseEntityExceptionHandler {
+
+    private final SensitiveFieldMasker sensitiveFieldMasker;
 
     @ExceptionHandler(ApiException.class)
     ResponseEntity<CommonErrorResponse> handleApiException(
@@ -51,9 +59,30 @@ public class GlobalExceptionController extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     ResponseEntity<CommonErrorResponse> handleException(
             Exception e,
-            HttpServletRequest request
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
-        log.error("예상하지 못한 예외 발생", e);
+        String requestId = response.getHeader("X-Request-Id");
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        String queryString = request.getQueryString();
+        String headers = Collections.list(request.getHeaderNames()).stream()
+                .map(name -> name + "=" + request.getHeader(name))
+                .collect(Collectors.joining(", "));
+
+        String body = "[unavailable]";
+        if (request instanceof ContentCachingRequestWrapper wrapper) {
+            body = sensitiveFieldMasker.maskJsonString(wrapper.getContentAsString());
+        }
+
+        log.error("""
+                Request ID: [{}] Request error occurred:
+                - URI: {} [{}]
+                - Query: {}
+                - Headers: {}
+                - Body: {}
+                - Exception Message: {}
+                """, requestId, uri, method, queryString, headers, body, e.getMessage(), e);
 
         return ResponseEntity.internalServerError().body(new CommonErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
