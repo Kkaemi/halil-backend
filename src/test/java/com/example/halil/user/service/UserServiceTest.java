@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.example.halil.user.domain.Password;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
+import com.example.halil.user.domain.exception.EmailDuplicateException;
+import com.example.halil.user.domain.exception.PasswordReusedException;
 import com.example.halil.user.dto.UserCreationDto;
 import com.example.halil.user.dto.UserSignupResponseDto;
 import com.example.halil.user.infra.BCryptPassword;
@@ -39,7 +41,7 @@ class UserServiceTest {
         String email = "thisisemail@email.com";
         String rawPassword = "this_is_password!1";
         Password password = new BCryptPassword(rawPassword);
-        User dummyUser = new User(email, password, null, null);
+        User dummyUser = new User(email, password);
 
         UserRepository userRepository = new UserMemoryRepository();
         userRepository.save(dummyUser);
@@ -50,7 +52,7 @@ class UserServiceTest {
 
         // when and then
         assertThatThrownBy(() -> sut.create(userCreationDto))
-                .isInstanceOf(UserErrorCode.EMAIL_ALREADY_EXISTS.exception().getClass());
+                .isInstanceOf(EmailDuplicateException.class);
     }
 
     @Test
@@ -60,7 +62,7 @@ class UserServiceTest {
         long userId = 1L;
         String rawPassword = "raw_password1234";
         Password password = new BCryptPassword(rawPassword);
-        User user = new User("", password, null, null);
+        User user = new User("", password);
 
         UserRepository userRepository = new UserMemoryRepository();
         userRepository.save(user);
@@ -69,6 +71,6 @@ class UserServiceTest {
 
         // when and then
         assertThatThrownBy(() -> sut.updatePassword(userId, rawPassword))
-                .isInstanceOf(UserErrorCode.PASSWORD_CANNOT_BE_REUSED.exception().getClass());
+                .isInstanceOf(PasswordReusedException.class);
     }
 }

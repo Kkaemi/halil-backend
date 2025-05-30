@@ -1,6 +1,8 @@
 package com.example.halil.user.domain;
 
-import com.example.halil.user.domain.exception.PasswordCannotBeReused;
+import com.example.halil.user.domain.exception.PasswordMismatchException;
+import com.example.halil.user.domain.exception.PasswordReusedException;
+import com.example.halil.user.domain.exception.UserStatusException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,20 +38,20 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-    public User(String email, Password password, UserRole role, UserStatus userStatus) {
+    public User(String email, Password password) {
         this.email = email;
         this.encodedPassword = password.encode();
-        this.role = role;
-        this.userStatus = userStatus;
+        this.role = UserRole.ROLE_USER;
+        this.userStatus = UserStatus.ACTIVE;
     }
 
     public void setTemporaryPassword(Password password) {
         this.encodedPassword = password.encode();
     }
 
-    public void updatePassword(Password password) throws PasswordCannotBeReused {
+    public void updatePassword(Password password) throws PasswordReusedException {
         if (password.matches(this.encodedPassword)) {
-            throw new PasswordCannotBeReused();
+            throw new PasswordReusedException("비밀번호는 재사용 할 수 없습니다.");
         }
 
         this.encodedPassword = password.encode();
@@ -61,11 +63,11 @@ public class User {
 
     public void authenticateWith(Password password) {
         if (!password.matches(this.encodedPassword)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
         }
 
         if (this.userStatus == UserStatus.DELETED) {
-            throw new IllegalStateException("탈퇴한 회원입니다.");
+            throw new UserStatusException("탈퇴한 회원입니다.");
         }
     }
 }

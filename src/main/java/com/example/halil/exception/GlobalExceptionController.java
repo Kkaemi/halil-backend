@@ -1,5 +1,9 @@
 package com.example.halil.exception;
 
+import com.example.halil.user.domain.exception.EmailDuplicateException;
+import com.example.halil.user.domain.exception.PasswordMismatchException;
+import com.example.halil.user.domain.exception.PasswordReusedException;
+import com.example.halil.user.domain.exception.UserStatusException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +22,26 @@ public class GlobalExceptionController extends ResponseEntityExceptionHandler {
             ApiException e,
             HttpServletRequest request
     ) {
-        log.warn(e.getMessage(), e);
-
         return ResponseEntity.status(e.getHttpStatus()).body(new CommonErrorResponse(
                 e.getHttpStatus().value(),
+                e.getMessage(),
+                LocalDateTime.now(),
+                request.getRequestURI()
+        ));
+    }
+
+    @ExceptionHandler({
+            PasswordMismatchException.class,
+            PasswordReusedException.class,
+            UserStatusException.class,
+            EmailDuplicateException.class
+    })
+    ResponseEntity<CommonErrorResponse> handleUserDomainException(
+            Exception e,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CommonErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
                 e.getMessage(),
                 LocalDateTime.now(),
                 request.getRequestURI()
