@@ -24,7 +24,7 @@ public class AuthToken {
     private final boolean verified;
 
     public boolean isValid() {
-        return this.verified;
+        return this.verified && Instant.now().isBefore(expirationTime.value());
     }
 
     public boolean isCloseExpirationTime() {
