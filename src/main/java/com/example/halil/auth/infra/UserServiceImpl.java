@@ -3,9 +3,9 @@ package com.example.halil.auth.infra;
 import com.example.halil.auth.domain.UserInfo;
 import com.example.halil.auth.domain.UserService;
 import com.example.halil.auth.service.AuthErrorCode;
+import com.example.halil.user.domain.PasswordFactory;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
-import com.example.halil.user.infra.BCryptPassword;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class UserServiceImpl implements UserService {
 
+    private final PasswordFactory passwordFactory;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(AuthErrorCode.USER_NOT_FOUND_BY_EMAIL::exception);
 
-        user.authenticateWith(new BCryptPassword(rawPassword));
+        user.authenticateWith(passwordFactory.createPassword(rawPassword));
 
         return new UserInfo(user.getId(), user.getRole().name());
     }
@@ -36,6 +37,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(AuthErrorCode.USER_NOT_FOUND_BY_EMAIL::exception);
 
         // 임시 비밀번호 설정
-        user.setTemporaryPassword(new BCryptPassword(temporaryPassword));
+        user.setTemporaryPassword(passwordFactory.createPassword(temporaryPassword));
     }
 }

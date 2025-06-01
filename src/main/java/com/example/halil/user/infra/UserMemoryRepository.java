@@ -40,4 +40,9 @@ public class UserMemoryRepository implements UserRepository {
     public Optional<User> findById(Long userId) {
         return Optional.ofNullable(userMap.get(userId));
     }
+
+    @Override
+    public void deleteAll() {
+        userMap.clear();
+    }
 }

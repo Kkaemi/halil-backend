@@ -4,18 +4,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.halil.user.domain.Password;
+import com.example.halil.user.domain.PasswordFactory;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;
 import com.example.halil.user.domain.exception.EmailDuplicateException;
 import com.example.halil.user.domain.exception.PasswordReusedException;
 import com.example.halil.user.dto.UserCreationDto;
 import com.example.halil.user.dto.UserSignupResponseDto;
-import com.example.halil.user.infra.BCryptPassword;
+import com.example.halil.user.infra.PasswordFactoryImpl;
 import com.example.halil.user.infra.UserMemoryRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class UserServiceTest {
+
+    private final UserRepository userRepository;
+    private final PasswordFactory passwordFactory;
+
+    public UserServiceTest() {
+        userRepository = new UserMemoryRepository();
+        passwordFactory = new PasswordFactoryImpl();
+    }
+
+    @AfterEach
+    void after_each() {
+        userRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("회원가입")
@@ -25,7 +40,7 @@ class UserServiceTest {
         String email = "thisisemail@email.com";
         String rawPassword = "this_is_password1234";
         UserCreationDto userCreationDto = new UserCreationDto(email, rawPassword);
-        UserService sut = new UserService(new UserMemoryRepository());
+        UserService sut = new UserService(userRepository, passwordFactory);
 
         // when
         UserSignupResponseDto result = sut.create(userCreationDto);
@@ -40,15 +55,14 @@ class UserServiceTest {
         // given
         String email = "thisisemail@email.com";
         String rawPassword = "this_is_password!1";
-        Password password = new BCryptPassword(rawPassword);
+        Password password = passwordFactory.createPassword(rawPassword);
         User dummyUser = new User(email, password);
 
-        UserRepository userRepository = new UserMemoryRepository();
         userRepository.save(dummyUser);
 
         UserCreationDto userCreationDto = new UserCreationDto(email, rawPassword);
 
-        UserService sut = new UserService(userRepository);
+        UserService sut = new UserService(userRepository, passwordFactory);
 
         // when and then
         assertThatThrownBy(() -> sut.create(userCreationDto))
@@ -61,13 +75,12 @@ class UserServiceTest {
         // given
         long userId = 1L;
         String rawPassword = "raw_password1234";
-        Password password = new BCryptPassword(rawPassword);
+        Password password = passwordFactory.createPassword(rawPassword);
         User user = new User("", password);
 
-        UserRepository userRepository = new UserMemoryRepository();
         userRepository.save(user);
 
-        UserService sut = new UserService(userRepository);
+        UserService sut = new UserService(userRepository, passwordFactory);
 
         // when and then
         assertThatThrownBy(() -> sut.updatePassword(userId, rawPassword))
