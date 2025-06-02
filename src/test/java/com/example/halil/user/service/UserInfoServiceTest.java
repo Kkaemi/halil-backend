@@ -17,12 +17,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class UserServiceTest {
+class UserInfoServiceTest {
 
     private final UserRepository userRepository;
     private final PasswordFactory passwordFactory;
 
-    public UserServiceTest() {
+    public UserInfoServiceTest() {
         userRepository = new UserMemoryRepository();
         passwordFactory = new PasswordFactoryImpl();
     }

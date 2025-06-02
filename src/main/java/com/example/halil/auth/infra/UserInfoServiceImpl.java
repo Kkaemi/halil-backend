@@ -1,7 +1,7 @@
 package com.example.halil.auth.infra;
 
 import com.example.halil.auth.domain.UserInfo;
-import com.example.halil.auth.domain.UserService;
+import com.example.halil.auth.domain.UserInfoService;
 import com.example.halil.auth.service.AuthErrorCode;
 import com.example.halil.user.domain.PasswordFactory;
 import com.example.halil.user.domain.User;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 @Component
-public class UserServiceImpl implements UserService {
+public class UserInfoServiceImpl implements UserInfoService {
 
     private final PasswordFactory passwordFactory;
     private final UserRepository userRepository;
@@ -28,15 +28,5 @@ public class UserServiceImpl implements UserService {
         user.authenticateWith(passwordFactory.createPassword(rawPassword));
 
         return new UserInfo(user.getId(), user.getRole().name());
-    }
-
-    @Override
-    public void setTemporaryPassword(String email, String temporaryPassword) {
-        // 유저를 찾을 수 없으면 예외 발생
-        User user = userRepository.findFirstByEmail(email)
-                .orElseThrow(AuthErrorCode.USER_NOT_FOUND_BY_EMAIL::exception);
-
-        // 임시 비밀번호 설정
-        user.setTemporaryPassword(passwordFactory.createPassword(temporaryPassword));
     }
 }
