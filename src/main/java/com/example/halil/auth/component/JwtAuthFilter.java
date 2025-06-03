@@ -1,13 +1,14 @@
 package com.example.halil.auth.component;
 
 import com.example.halil.auth.domain.AuthToken;
-import com.example.halil.auth.domain.JwtService;
+import com.example.halil.auth.domain.AuthTokenFactory;
 import com.example.halil.auth.domain.UserInfo;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final AuthTokenFactory authTokenFactory;
 
     @Override
     protected void doFilterInternal(
@@ -37,9 +38,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        AuthToken authToken = jwtService.parse(token);
+        AuthToken authToken = authTokenFactory.parseAccessToken(token);
 
-        if (!authToken.isValid()) {
+        if (!authToken.isValidFromNow(Instant.now())) {
             filterChain.doFilter(request, response);
             return;
         }

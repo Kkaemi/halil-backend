@@ -1,7 +1,6 @@
 package com.example.halil.auth.domain;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +22,12 @@ public class AuthToken {
     @Getter(AccessLevel.NONE)
     private final boolean verified;
 
-    public boolean isValid() {
-        return this.verified && Instant.now().isBefore(expirationTime.value());
+    public boolean isValidFromNow(Instant now) {
+        return this.verified && now.isBefore(expirationTime.value());
     }
 
-    public boolean isCloseExpirationTime() {
-        return Instant.now().isAfter(expirationTime.value().minus(7L, ChronoUnit.DAYS));
+    public boolean isCloseExpirationTimeFromNow(Instant now) {
+        return now.isAfter(expirationTime.value().minus(this.type.getThreshold()))
+                && now.isBefore(expirationTime.value());
     }
 }

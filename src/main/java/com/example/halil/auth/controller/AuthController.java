@@ -1,6 +1,5 @@
 package com.example.halil.auth.controller;
 
-import com.example.halil.auth.dto.AccessTokenResponseDto;
 import com.example.halil.auth.dto.JwtBundleDto;
 import com.example.halil.auth.dto.LoginRequestDto;
 import com.example.halil.auth.dto.LoginResponseDto;
@@ -9,7 +8,6 @@ import com.example.halil.auth.service.TokenRefreshUseCase;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,43 +29,42 @@ public class AuthController {
         JwtBundleDto jwtBundleDto = loginUseCase.login(requestDto);
 
         // 쿠키 세팅
-        Cookie cookie = new Cookie(CookieConstants.REFRESH_TOKEN_COOKIE_NAME, jwtBundleDto.refreshToken());
+        Cookie cookie = new Cookie(
+                CookieConstants.REFRESH_TOKEN_COOKIE_NAME,
+                jwtBundleDto.refreshToken().getValue()
+        );
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setAttribute(CookieConstants.SAME_SITE_NAME, CookieConstants.SAME_SITE_VALUE);
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        return new LoginResponseDto(jwtBundleDto.accessToken());
+        return new LoginResponseDto(jwtBundleDto.accessToken().getValue());
     }
 
     @PostMapping("/v1/auth/token-refresh")
-    public AccessTokenResponseDto reissueToken(
-            // 커스텀 예외 처리를 위해 required = false
-            @CookieValue(value = CookieConstants.REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken,
+    public LoginResponseDto reissueToken(
+            @CookieValue(value = CookieConstants.REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
             HttpServletResponse response
     ) {
         JwtBundleDto jwtBundleDto = tokenRefreshUseCase.refresh(refreshToken);
-        String reissuedAccessToken = jwtBundleDto.accessToken();
-        String reissuedRefreshToken = Optional.ofNullable(jwtBundleDto.refreshToken()).orElse(refreshToken);
 
-        Cookie cookie = new Cookie(CookieConstants.REFRESH_TOKEN_COOKIE_NAME, reissuedRefreshToken);
+        Cookie cookie = new Cookie(CookieConstants.REFRESH_TOKEN_COOKIE_NAME, null);
 
-        AccessTokenResponseDto responseDto = new AccessTokenResponseDto(reissuedAccessToken);
-
-        if (reissuedAccessToken == null) {
+        if (jwtBundleDto.refreshToken() == null) {
             cookie.setMaxAge(0);
             cookie.setPath("/");
             response.addCookie(cookie);
-            return responseDto;
+            return new LoginResponseDto(jwtBundleDto.accessToken().getValue());
         }
 
         // refreshToken이 있으면 쿠키 재설정
+        cookie.setValue(jwtBundleDto.refreshToken().getValue());
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setAttribute(CookieConstants.SAME_SITE_NAME, CookieConstants.SAME_SITE_VALUE);
         response.addCookie(cookie);
 
-        return responseDto;
+        return new LoginResponseDto(jwtBundleDto.accessToken().getValue());
     }
 }

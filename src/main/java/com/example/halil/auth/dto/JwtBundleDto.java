@@ -1,8 +1,10 @@
 package com.example.halil.auth.dto;
 
+import com.example.halil.auth.domain.AuthToken;
+
 public record JwtBundleDto(
-        String accessToken,
-        String refreshToken
+        AuthToken accessToken,
+        AuthToken refreshToken
 ) {
 
 }
