@@ -1,4 +1,4 @@
-package com.example.halil.config.web;
+package com.example.halil.global.config.web;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

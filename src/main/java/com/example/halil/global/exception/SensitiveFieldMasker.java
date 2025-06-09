@@ -1,4 +1,4 @@
-package com.example.halil.exception;
+package com.example.halil.global.exception;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

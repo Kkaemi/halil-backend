@@ -1,4 +1,4 @@
-package com.example.halil.config.jpa;
+package com.example.halil.global.config.jpa;
 
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;

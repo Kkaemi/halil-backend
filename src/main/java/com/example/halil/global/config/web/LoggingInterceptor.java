@@ -1,4 +1,4 @@
-package com.example.halil.config.web;
+package com.example.halil.global.config.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

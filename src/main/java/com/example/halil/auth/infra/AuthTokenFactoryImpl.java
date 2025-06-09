@@ -6,7 +6,7 @@ import com.example.halil.auth.domain.ExpirationTime;
 import com.example.halil.auth.domain.IssuedAt;
 import com.example.halil.auth.domain.TokenType;
 import com.example.halil.auth.domain.UserInfo;
-import com.example.halil.properties.JwtProperties;
+import com.example.halil.global.config.properties.JwtProperties;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;

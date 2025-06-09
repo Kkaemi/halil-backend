@@ -9,7 +9,7 @@ import com.example.halil.auth.infra.AuthTokenFactoryImpl;
 import com.example.halil.auth.infra.FixedTimeProvider;
 import com.example.halil.auth.infra.TimeProvider;
 import com.example.halil.auth.infra.UserInfoServiceImpl;
-import com.example.halil.properties.JwtProperties;
+import com.example.halil.global.config.properties.JwtProperties;
 import com.example.halil.user.domain.PasswordFactory;
 import com.example.halil.user.domain.User;
 import com.example.halil.user.domain.UserRepository;

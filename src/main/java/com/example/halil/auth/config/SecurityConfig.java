@@ -1,6 +1,5 @@
-package com.example.halil.config;
+package com.example.halil.auth.config;
 
-import com.example.halil.auth.component.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

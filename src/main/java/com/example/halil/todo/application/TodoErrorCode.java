@@ -1,6 +1,6 @@
 package com.example.halil.todo.application;
 
-import com.example.halil.exception.ApiException;
+import com.example.halil.global.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 

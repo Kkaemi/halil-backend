@@ -1,6 +1,6 @@
-package com.example.halil.auth.component;
+package com.example.halil.auth.config;
 
-import com.example.halil.exception.CommonErrorResponse;
+import com.example.halil.global.exception.CommonErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

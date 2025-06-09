@@ -1,4 +1,4 @@
-package com.example.halil.auth.component;
+package com.example.halil.auth.config;
 
 import com.example.halil.auth.domain.AuthToken;
 import com.example.halil.auth.domain.AuthTokenFactory;

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.example.halil.auth.infra.AuthTokenFactoryImpl;
 import com.example.halil.auth.infra.FixedTimeProvider;
 import com.example.halil.auth.infra.TimeProvider;
-import com.example.halil.properties.JwtProperties;
+import com.example.halil.global.config.properties.JwtProperties;
 import java.security.SecureRandom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

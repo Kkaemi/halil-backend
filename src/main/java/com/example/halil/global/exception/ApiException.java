@@ -1,4 +1,4 @@
-package com.example.halil.exception;
+package com.example.halil.global.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

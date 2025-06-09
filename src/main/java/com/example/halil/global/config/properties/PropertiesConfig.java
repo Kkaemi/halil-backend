@@ -1,9 +1,9 @@
-package com.example.halil.config;
+package com.example.halil.global.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Configuration;
 
-@ConfigurationPropertiesScan("com.example.halil.properties")
+@ConfigurationPropertiesScan("com.example.halil.global.config.properties")
 @Configuration
 public class PropertiesConfig {
 

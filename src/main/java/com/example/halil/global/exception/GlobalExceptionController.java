@@ -1,4 +1,4 @@
-package com.example.halil.exception;
+package com.example.halil.global.exception;
 
 import com.example.halil.user.domain.exception.EmailDuplicateException;
 import com.example.halil.user.domain.exception.PasswordMismatchException;

@@ -1,7 +1,7 @@
 package com.example.halil.user.infra;
 
 import com.example.halil.auth.service.AuthErrorCode;
-import com.example.halil.properties.CommonProperties;
+import com.example.halil.global.config.properties.CommonProperties;
 import com.example.halil.user.service.MailService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;

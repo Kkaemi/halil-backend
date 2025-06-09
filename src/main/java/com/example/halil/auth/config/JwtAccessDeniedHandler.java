@@ -1,4 +1,4 @@
-package com.example.halil.auth.component;
+package com.example.halil.auth.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,4 +1,4 @@
-package com.example.halil.properties;
+package com.example.halil.global.config.properties;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
