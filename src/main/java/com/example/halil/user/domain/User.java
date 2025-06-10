@@ -1,6 +1,6 @@
 package com.example.halil.user.domain;
 
-import com.example.halil.user.domain.exception.PasswordMismatchException;
+import com.example.halil.user.domain.exception.LoginException;
 import com.example.halil.user.domain.exception.PasswordReusedException;
 import com.example.halil.user.domain.exception.UserStatusException;
 import jakarta.persistence.Column;
@@ -61,9 +61,9 @@ public class User {
         this.userStatus = UserStatus.DELETED;
     }
 
-    public void authenticateWith(Password password) {
+    public void login(Password password) {
         if (!password.matches(this.encodedPassword)) {
-            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+            throw new LoginException("비밀번호가 일치하지 않습니다.");
         }
 
         if (this.userStatus == UserStatus.DELETED) {

@@ -1,7 +1,7 @@
 package com.example.halil.global.exception;
 
 import com.example.halil.user.domain.exception.EmailDuplicateException;
-import com.example.halil.user.domain.exception.PasswordMismatchException;
+import com.example.halil.user.domain.exception.LoginException;
 import com.example.halil.user.domain.exception.PasswordReusedException;
 import com.example.halil.user.domain.exception.UserStatusException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class GlobalExceptionController extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({
-            PasswordMismatchException.class,
+            LoginException.class,
             PasswordReusedException.class,
             UserStatusException.class,
             EmailDuplicateException.class

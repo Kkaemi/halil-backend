@@ -1,6 +1,5 @@
 package com.example.halil.user.infra;
 
-import com.example.halil.auth.service.AuthErrorCode;
 import com.example.halil.global.config.properties.CommonProperties;
 import com.example.halil.user.service.MailService;
 import jakarta.mail.internet.MimeMessage;
@@ -46,7 +45,7 @@ public class MailServiceImpl implements MailService {
             javaMailSender.send(mimeMessage);
         } catch (Exception e) {
             log.warn("메일 전송에 실패했습니다", e);
-            throw AuthErrorCode.MAIL_DELIVERY_FAILED.exception();
+            throw new RuntimeException(e);
         }
     }
 }
